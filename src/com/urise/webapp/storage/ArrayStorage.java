@@ -4,17 +4,19 @@ import com.urise.webapp.model.Resume;
 
 import java.util.Arrays;
 
-public class ArrayStorage {
+public class ArrayStorage implements Storage {
     protected static final int STORAGE_LIMIT = 10000;
     protected final Resume[] storage = new Resume[STORAGE_LIMIT];
     int countResumes = 0;
 
+    @Override
     public void clear() {
         Arrays.fill(storage, 0, countResumes - 1, null);
         countResumes = 0;
         System.out.println("Хранилище очищенно.");
     }
 
+    @Override
     public void update(Resume r) {
         int index = findIndex(r.getUuid());
         if (index == -1) {
@@ -24,6 +26,7 @@ public class ArrayStorage {
         }
     }
 
+    @Override
     public void save(Resume r) {
         int index = findIndex(r.getUuid());
         if (countResumes == STORAGE_LIMIT) {
@@ -36,6 +39,7 @@ public class ArrayStorage {
         }
     }
 
+    @Override
     public void delete(String uuid) {
         int index = findIndex(uuid);
         if (index == -1) {
@@ -48,6 +52,7 @@ public class ArrayStorage {
         }
     }
 
+    @Override
     public Resume get(String uuid) {
         int index = findIndex(uuid);
         if (index == -1) {
@@ -57,15 +62,18 @@ public class ArrayStorage {
         return storage[index];
     }
 
+    @Override
     public Resume[] getAll() {
         return Arrays.copyOf(storage, countResumes);
     }
 
+    @Override
     public int size() {
         return countResumes;
     }
 
-    private int findIndex(String uuid) {
+    @Override
+    public int findIndex(String uuid) {
         for (int i = 0; i < countResumes; i++) {
             if (storage[i].getUuid().equals(uuid)) {
                 return i;
