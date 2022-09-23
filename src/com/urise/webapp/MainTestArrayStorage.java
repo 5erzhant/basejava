@@ -4,8 +4,6 @@ import com.urise.webapp.model.Resume;
 import com.urise.webapp.storage.AbstractArrayStorage;
 import com.urise.webapp.storage.SortedArrayStorage;
 
-import java.util.Arrays;
-
 public class MainTestArrayStorage {
     static final AbstractArrayStorage SORTED_ARRAY_STORAGE = new SortedArrayStorage();
 

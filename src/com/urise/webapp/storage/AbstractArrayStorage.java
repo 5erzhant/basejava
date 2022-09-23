@@ -35,7 +35,7 @@ public abstract class AbstractArrayStorage implements Storage {
         } else if (index > -1) {
             System.out.println("uuid: " + r.getUuid() + " уже существует.");
         } else {
-            insert(index, r);
+            insertResume(index, r);
             countResumes++;
         }
     }
@@ -55,8 +55,8 @@ public abstract class AbstractArrayStorage implements Storage {
             System.out.println("uuid: " + uuid + " не найден.");
         } else {
             System.out.println("uuid: " + storage[index].getUuid() + " удален.");
-            extract(index);
             countResumes--;
+            deleteResume(index);
         }
     }
 
@@ -67,8 +67,8 @@ public abstract class AbstractArrayStorage implements Storage {
 
     protected abstract int findIndex(String uuid);
 
-    protected abstract void insert(int index, Resume r);
+    protected abstract void insertResume(int index, Resume r);
 
-    protected abstract void extract(int index);
+    protected abstract void deleteResume(int index);
 
 }

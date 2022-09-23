@@ -13,13 +13,13 @@ public class ArrayStorage extends AbstractArrayStorage {
         return -1;
     }
 
-    public void insert(int index, Resume r) {
+    public void insertResume(int index, Resume r) {
         storage[countResumes] = r;
     }
 
     @Override
-    protected void extract(int index) {
-        storage[index] = storage[countResumes - 1];
-        storage[countResumes - 1] = null;
+    protected void deleteResume(int index) {
+        storage[index] = storage[countResumes];
+        storage[countResumes] = null;
     }
 }

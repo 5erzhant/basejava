@@ -14,17 +14,15 @@ public class SortedArrayStorage extends AbstractArrayStorage {
     }
 
     @Override
-    protected void insert(int index, Resume r) {
+    protected void insertResume(int index, Resume r) {
         int insertIndex = Math.abs(index) - 1;
-        if (countResumes > 0 && insertIndex < countResumes) {
-            System.arraycopy(storage, insertIndex, storage, insertIndex + 1, countResumes - insertIndex);
-        }
+        System.arraycopy(storage, insertIndex, storage, insertIndex + 1, countResumes - insertIndex);
         storage[insertIndex] = r;
     }
 
     @Override
-    protected void extract(int index) {
-        System.arraycopy(storage, index + 1, storage, index, countResumes - 1 - index);
-        storage[countResumes - 1] = null;
+    protected void deleteResume(int index) {
+        System.arraycopy(storage, index + 1, storage, index, countResumes - index);
+        storage[countResumes] = null;
     }
 }
