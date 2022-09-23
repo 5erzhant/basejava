@@ -1,5 +1,8 @@
 package com.urise.webapp.storage;
 
+import com.urise.webapp.exception.ExistStorageException;
+import com.urise.webapp.exception.NotExistStorageException;
+import com.urise.webapp.exception.StorageException;
 import com.urise.webapp.model.Resume;
 
 import java.util.Arrays;
@@ -16,8 +19,7 @@ public abstract class AbstractArrayStorage implements Storage {
     public Resume get(String uuid) {
         int index = findIndex(uuid);
         if (index < 0) {
-            System.out.println("uuid: " + uuid + " не найден.");
-            return null;
+            throw new NotExistStorageException(uuid);
         }
         return storage[index];
     }
@@ -31,9 +33,9 @@ public abstract class AbstractArrayStorage implements Storage {
     public void save(Resume r) {
         int index = findIndex(r.getUuid());
         if (countResumes == STORAGE_LIMIT) {
-            System.out.println("Хранилище переполнено!");
+            throw new StorageException("Storage overflow", r.getUuid());
         } else if (index > -1) {
-            System.out.println("uuid: " + r.getUuid() + " уже существует.");
+            throw new ExistStorageException(r.getUuid());
         } else {
             insertResume(index, r);
             countResumes++;
@@ -43,7 +45,7 @@ public abstract class AbstractArrayStorage implements Storage {
     public void update(Resume r) {
         int index = findIndex(r.getUuid());
         if (index < 0) {
-            System.out.println("uuid: " + r.getUuid() + " не существует.");
+            throw new NotExistStorageException(r.getUuid());
         } else {
             storage[index] = r;
         }
@@ -52,7 +54,7 @@ public abstract class AbstractArrayStorage implements Storage {
     public void delete(String uuid) {
         int index = findIndex(uuid);
         if (index < 0) {
-            System.out.println("uuid: " + uuid + " не найден.");
+            throw new NotExistStorageException(uuid);
         } else {
             System.out.println("uuid: " + storage[index].getUuid() + " удален.");
             countResumes--;
