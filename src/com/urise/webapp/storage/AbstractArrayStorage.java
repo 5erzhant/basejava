@@ -25,9 +25,8 @@ public abstract class AbstractArrayStorage implements Storage {
     }
 
     public void clear() {
-        Arrays.fill(storage, 0, countResumes - 1, null);
+        Arrays.fill(storage, 0, countResumes, null);
         countResumes = 0;
-        System.out.println("Хранилище очищенно.");
     }
 
     public void save(Resume r) {
