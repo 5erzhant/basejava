@@ -7,15 +7,17 @@ import com.urise.webapp.model.Resume;
 
 import java.util.Arrays;
 
-public abstract class AbstractArrayStorage implements Storage {
+public abstract class AbstractArrayStorage extends AbstractStorage implements Storage {
     protected static final int STORAGE_LIMIT = 10000;
     public final Resume[] storage = new Resume[STORAGE_LIMIT];
     protected int countResumes = 0;
 
+    @Override
     public int size() {
         return countResumes;
     }
 
+    @Override
     public Resume get(String uuid) {
         int index = findIndex(uuid);
         if (index < 0) {
@@ -24,11 +26,13 @@ public abstract class AbstractArrayStorage implements Storage {
         return storage[index];
     }
 
+    @Override
     public void clear() {
         Arrays.fill(storage, 0, countResumes, null);
         countResumes = 0;
     }
 
+    @Override
     public void save(Resume r) {
         int index = findIndex(r.getUuid());
         if (countResumes == STORAGE_LIMIT) {
@@ -41,6 +45,7 @@ public abstract class AbstractArrayStorage implements Storage {
         }
     }
 
+    @Override
     public void update(Resume r) {
         int index = findIndex(r.getUuid());
         if (index < 0) {
@@ -50,6 +55,7 @@ public abstract class AbstractArrayStorage implements Storage {
         }
     }
 
+    @Override
     public void delete(String uuid) {
         int index = findIndex(uuid);
         if (index < 0) {
@@ -61,6 +67,7 @@ public abstract class AbstractArrayStorage implements Storage {
         }
     }
 
+    @Override
     public Resume[] getAll() {
         return Arrays.copyOf(storage, countResumes);
     }
