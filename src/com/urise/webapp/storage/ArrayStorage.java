@@ -4,6 +4,7 @@ import com.urise.webapp.model.Resume;
 
 public class ArrayStorage extends AbstractArrayStorage {
 
+    @Override
     protected int findIndex(String uuid) {
         for (int i = 0; i < countResumes; i++) {
             if ((storage[i].getUuid()).equals(uuid)) {
@@ -13,12 +14,13 @@ public class ArrayStorage extends AbstractArrayStorage {
         return -1;
     }
 
-    public void insertResume(int index, Resume r) {
+    @Override
+    protected void insertResume(int index, Resume r) {
         storage[countResumes] = r;
     }
 
     @Override
-    protected void deleteResume(int index) {
+    protected void extractResume(int index) {
         storage[index] = storage[countResumes];
         storage[countResumes] = null;
     }

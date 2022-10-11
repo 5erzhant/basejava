@@ -1,7 +1,5 @@
 package com.urise.webapp.storage;
 
-import com.urise.webapp.exception.ExistStorageException;
-import com.urise.webapp.exception.NotExistStorageException;
 import com.urise.webapp.model.Resume;
 
 import java.util.ArrayList;
@@ -18,49 +16,46 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    public void update(Resume r) {
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i).getUuid().equals(r.getUuid())) {
-                list.set(i, r);
-                return;
-            }
-        }
-        throw new NotExistStorageException(r.getUuid());
+    protected void updateResume(int index, Resume r) {
+        list.set(index, r);
     }
 
     @Override
-    public void save(Resume r) {
-        if (!list.contains(r)) {
-            list.add(r);
-        } else {
-            throw new ExistStorageException(r.getUuid());
-        }
+    protected void saveResume(Resume r, int index) {
+        list.add(r);
     }
 
     @Override
-    public void delete(String uuid) {
+    protected void deleteResume(String uuid, int index) {
         Iterator<Resume> iterator = list.iterator();
         while (iterator.hasNext()) {
             if (Objects.equals((iterator.next()).getUuid(), uuid)) {
                 iterator.remove();
-            } else {
-                throw new NotExistStorageException(uuid);
             }
         }
     }
 
     @Override
-    public Resume get(String uuid) {
-        for (Resume resume : list) {
-            if (resume.getUuid().equals(uuid)) {
-                return resume;
+    protected Resume getResume(int index, String uuid) {
+        return list.get(index);
+    }
+
+    @Override
+    protected int findIndex(String uuid) {
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getUuid().equals(uuid)) {
+                return i;
             }
         }
-        throw new NotExistStorageException(uuid);
+        return -1;
     }
 
     @Override
     public int size() {
         return list.size();
+    }
+
+    public Resume[] getAll() {
+        return list.toArray(new Resume[list.size()]);
     }
 }

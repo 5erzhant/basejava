@@ -1,13 +1,11 @@
 package com.urise.webapp.storage;
 
-import com.urise.webapp.exception.ExistStorageException;
-import com.urise.webapp.exception.NotExistStorageException;
 import com.urise.webapp.exception.StorageException;
 import com.urise.webapp.model.Resume;
 
 import java.util.Arrays;
 
-public abstract class AbstractArrayStorage extends AbstractStorage implements Storage {
+public abstract class AbstractArrayStorage extends AbstractStorage {
     protected static final int STORAGE_LIMIT = 10000;
     public final Resume[] storage = new Resume[STORAGE_LIMIT];
     protected int countResumes = 0;
@@ -17,12 +15,7 @@ public abstract class AbstractArrayStorage extends AbstractStorage implements St
         return countResumes;
     }
 
-    @Override
-    public Resume get(String uuid) {
-        int index = findIndex(uuid);
-        if (index < 0) {
-            throw new NotExistStorageException(uuid);
-        }
+    public Resume getResume(int index, String uuid) {
         return storage[index];
     }
 
@@ -32,39 +25,21 @@ public abstract class AbstractArrayStorage extends AbstractStorage implements St
         countResumes = 0;
     }
 
-    @Override
-    public void save(Resume r) {
-        int index = findIndex(r.getUuid());
+    protected void saveResume(Resume r, int index) {
         if (countResumes == STORAGE_LIMIT) {
             throw new StorageException("Storage overflow", r.getUuid());
-        } else if (index > -1) {
-            throw new ExistStorageException(r.getUuid());
-        } else {
-            insertResume(index, r);
-            countResumes++;
         }
+        insertResume(index, r);
+        countResumes++;
     }
 
-    @Override
-    public void update(Resume r) {
-        int index = findIndex(r.getUuid());
-        if (index < 0) {
-            throw new NotExistStorageException(r.getUuid());
-        } else {
-            storage[index] = r;
-        }
+    public void updateResume(int index, Resume r) {
+        storage[index] = r;
     }
 
-    @Override
-    public void delete(String uuid) {
-        int index = findIndex(uuid);
-        if (index < 0) {
-            throw new NotExistStorageException(uuid);
-        } else {
-            System.out.println("uuid: " + storage[index].getUuid() + " удален.");
-            countResumes--;
-            deleteResume(index);
-        }
+    protected void deleteResume(String uuid, int index) {
+        countResumes--;
+        extractResume(index);
     }
 
     @Override
@@ -72,11 +47,10 @@ public abstract class AbstractArrayStorage extends AbstractStorage implements St
         return Arrays.copyOf(storage, countResumes);
     }
 
-
     protected abstract int findIndex(String uuid);
 
     protected abstract void insertResume(int index, Resume r);
 
-    protected abstract void deleteResume(int index);
+    protected abstract void extractResume(int index);
 
 }

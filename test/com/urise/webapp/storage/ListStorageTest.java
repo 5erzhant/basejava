@@ -12,9 +12,4 @@ public class ListStorageTest extends AbstractStorageTest {
     @Test
     public void saveOverflow() {
     }
-
-    @Override
-    @Test
-    public void getAll() {
-    }
 }
