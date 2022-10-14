@@ -3,8 +3,6 @@ package com.urise.webapp.storage;
 import com.urise.webapp.model.Resume;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Objects;
 
 public class ListStorage extends AbstractStorage {
 
@@ -16,32 +14,27 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected void updateResume(int index, Resume r) {
-        list.set(index, r);
+    protected void doUpdate(Object searchKey, Resume r) {
+        list.set((int) searchKey, r);
     }
 
     @Override
-    protected void saveResume(Resume r, int index) {
+    protected void doSave(Resume r, Object searchKey) {
         list.add(r);
     }
 
     @Override
-    protected void deleteResume(String uuid, int index) {
-        Iterator<Resume> iterator = list.iterator();
-        while (iterator.hasNext()) {
-            if (Objects.equals((iterator.next()).getUuid(), uuid)) {
-                iterator.remove();
-            }
-        }
+    protected void doDelete(String uuid, Object searchKey) {
+        list.remove((int) searchKey);
     }
 
     @Override
-    protected Resume getResume(int index, String uuid) {
-        return list.get(index);
+    protected Resume doGet(Object searchKey, String uuid) {
+        return list.get((int) searchKey);
     }
 
     @Override
-    protected int findIndex(String uuid) {
+    protected Object findSearchKey(String uuid) {
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).getUuid().equals(uuid)) {
                 return i;
@@ -56,6 +49,6 @@ public class ListStorage extends AbstractStorage {
     }
 
     public Resume[] getAll() {
-        return list.toArray(new Resume[list.size()]);
+        return list.toArray(new Resume[0]);
     }
 }

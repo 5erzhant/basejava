@@ -7,50 +7,50 @@ import com.urise.webapp.model.Resume;
 public abstract class AbstractStorage implements Storage {
 
     public void update(Resume r) {
-        int index = getIndexIfExist(r.getUuid());
-        updateResume(index, r);
+        Object searchKey = getExistingSearchKey(r.getUuid());
+        doUpdate(searchKey, r);
     }
 
     public void save(Resume r) {
-        int index = getIndexIfNotExist(r.getUuid());
-        saveResume(r, index);
+        Object searchKey = getNotExistingSearchKey(r.getUuid());
+        doSave(r, searchKey);
     }
 
     public void delete(String uuid) {
-        int index = getIndexIfExist(uuid);
-        deleteResume(uuid, index);
+        Object searchKey = getExistingSearchKey(uuid);
+        doDelete(uuid, searchKey);
     }
 
     public Resume get(String uuid) {
-        int index = getIndexIfExist(uuid);
-        return getResume(index, uuid);
+        Object searchKey = getExistingSearchKey(uuid);
+        return doGet(searchKey, uuid);
     }
 
-    protected int getIndexIfExist(String uuid) {
-        int index = findIndex(uuid);
-        if (index < 0) {
+    protected Object getExistingSearchKey(String uuid) {
+        Object searchKey = findSearchKey(uuid);
+        if ((int) searchKey < 0) {
             throw new NotExistStorageException(uuid);
         } else {
-            return index;
+            return searchKey;
         }
     }
 
-    protected int getIndexIfNotExist(String uuid) {
-        int index = findIndex(uuid);
-        if (index >= 0) {
+    protected Object getNotExistingSearchKey(String uuid) {
+        Object searchKey = findSearchKey(uuid);
+        if ((int) searchKey >= 0) {
             throw new ExistStorageException(uuid);
         } else {
-            return index;
+            return searchKey;
         }
     }
 
-    protected abstract void updateResume(int index, Resume r);
+    protected abstract void doUpdate(Object searchKey, Resume r);
 
-    protected abstract Resume getResume(int index, String uuid);
+    protected abstract Resume doGet(Object searchKey, String uuid);
 
-    protected abstract int findIndex(String uuid);
+    protected abstract Object findSearchKey(String uuid);
 
-    protected abstract void saveResume(Resume r, int index);
+    protected abstract void doSave(Resume r, Object searchKey);
 
-    protected abstract void deleteResume(String uuid, int index);
+    protected abstract void doDelete(String uuid, Object searchKey);
 }

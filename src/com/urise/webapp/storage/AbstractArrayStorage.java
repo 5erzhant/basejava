@@ -15,8 +15,8 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         return countResumes;
     }
 
-    public Resume getResume(int index, String uuid) {
-        return storage[index];
+    public Resume doGet(Object searchKey, String uuid) {
+        return storage[(int) searchKey];
     }
 
     @Override
@@ -25,21 +25,21 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         countResumes = 0;
     }
 
-    protected void saveResume(Resume r, int index) {
+    protected void doSave(Resume r, Object searchKey) {
         if (countResumes == STORAGE_LIMIT) {
             throw new StorageException("Storage overflow", r.getUuid());
         }
-        insertResume(index, r);
+        insertResume((int) searchKey, r);
         countResumes++;
     }
 
-    public void updateResume(int index, Resume r) {
-        storage[index] = r;
+    public void doUpdate(Object searchKey, Resume r) {
+        storage[(int) searchKey] = r;
     }
 
-    protected void deleteResume(String uuid, int index) {
+    protected void doDelete(String uuid, Object searchKey) {
         countResumes--;
-        extractResume(index);
+        deleteResume((int) searchKey);
     }
 
     @Override
@@ -47,10 +47,8 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
         return Arrays.copyOf(storage, countResumes);
     }
 
-    protected abstract int findIndex(String uuid);
-
     protected abstract void insertResume(int index, Resume r);
 
-    protected abstract void extractResume(int index);
+    protected abstract void deleteResume(int index);
 
 }
