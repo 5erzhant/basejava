@@ -20,14 +20,19 @@ public class MainCollection {
         collection.add(RESUME_2);
         collection.add(RESUME_3);
 
-        Iterator<Resume> iterator = collection.iterator();
-        while (iterator.hasNext()) {
-            Resume resume = iterator.next();
+//        Iterator<Resume> iterator = collection.iterator();
+//        while (iterator.hasNext()) {
+//            Resume resume = iterator.next();
+//            System.out.println(resume);
+//            if (Objects.equals(resume.getUuid(), UUID_1)) {
+//                iterator.remove();
+//            }
+//        }
+
+        for (Resume resume : collection) {
             System.out.println(resume);
-            if (Objects.equals(resume.getUuid(), UUID_1)) {
-                iterator.remove();
-            }
         }
+
         System.out.println(collection);
 
         Map<String, Resume> map = new HashMap<>();
