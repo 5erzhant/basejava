@@ -9,7 +9,7 @@ public class MainTestArrayStorage {
 
     public static void main(String[] args) {
         Resume r1 = new Resume("uuid3", "Alex");
-        Resume r2 = new Resume("uuid2","Petr");
+        Resume r2 = new Resume("uuid2", "Petr");
         Resume r3 = new Resume("uuid1", "Alex");
         Resume r4 = new Resume("uuid3", "Egor");
 

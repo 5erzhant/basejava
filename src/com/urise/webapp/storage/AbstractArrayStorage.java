@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class AbstractArrayStorage extends AbstractStorage {
+public abstract class AbstractArrayStorage extends AbstractStorage<Integer> {
     protected static final int STORAGE_LIMIT = 10000;
     public final Resume[] storage = new Resume[STORAGE_LIMIT];
     protected int countResumes = 0;
@@ -28,28 +28,28 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    public Resume doGet(Object searchKey) {
-        return storage[(Integer) searchKey];
+    public Resume doGet(Integer searchKey) {
+        return storage[searchKey];
     }
 
     @Override
-    protected void doSave(Resume r, Object searchKey) {
+    protected void doSave(Resume r, Integer searchKey) {
         if (countResumes == STORAGE_LIMIT) {
             throw new StorageException("Storage overflow", r.getUuid());
         }
-        insertResume((Integer) searchKey, r);
+        insertResume(searchKey, r);
         countResumes++;
     }
 
     @Override
-    public void doUpdate(Resume r, Object searchKey) {
-        storage[(Integer) searchKey] = r;
+    public void doUpdate(Resume r, Integer searchKey) {
+        storage[searchKey] = r;
     }
 
     @Override
-    protected void doDelete(Object searchKey) {
+    protected void doDelete(Integer searchKey) {
         countResumes--;
-        deleteResume((Integer) searchKey);
+        deleteResume(searchKey);
     }
 
     @Override

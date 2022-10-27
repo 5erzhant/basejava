@@ -44,7 +44,7 @@ public class MainCollection {
         map.put(UUID_2, RESUME_2);
         map.put(UUID_3, RESUME_3);
 
-        for (Map.Entry<String, Resume> entry : map.entrySet() ) {
+        for (Map.Entry<String, Resume> entry : map.entrySet()) {
             System.out.println(entry.getValue());
         }
 
