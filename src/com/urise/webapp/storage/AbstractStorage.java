@@ -19,6 +19,7 @@ public abstract class AbstractStorage<SK> implements Storage {
             .thenComparing(Resume::getUuid);
 
     private static final Logger LOG = Logger.getLogger(AbstractStorage.class.getName());
+
     protected abstract void doUpdate(Resume r, SK searchKey);
 
     protected abstract Resume doGet(SK searchKey);

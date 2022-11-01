@@ -1,13 +1,11 @@
 package com.urise.webapp.model;
 
-import static org.junit.Assert.*;
-
 public class ResumeTestData {
     public static void main(String[] args) {
         Resume resume = new Resume("Григорий Кислин");
-        resume.setContent(Contacts.PHONE_NUMBER, "+7(921) 855-0482");
-        resume.setContent(Contacts.SKYPE, "skype:grigory.kislin");
-        resume.setContent(Contacts.MAIL, "gkislin@yandex.ru");
+        resume.setContent(ContactType.PHONE_NUMBER, "+7(921) 855-0482");
+        resume.setContent(ContactType.SKYPE, "skype:grigory.kislin");
+        resume.setContent(ContactType.MAIL, "gkislin@yandex.ru");
         resume.setContent(SectionType.OBJECTIVE, "Ведущий стажировок и корпоративного обучения по Java Web и " +
                 "Enterprise технологиям");
         resume.setContent(SectionType.PERSONAL, "Аналитический склад ума, сильная логика, креативность, " +
@@ -29,8 +27,8 @@ public class ResumeTestData {
                 "стажировок.");
         resume.setContent(SectionType.EDUCATION, "'Functional Programming Principles in Scala' by Martin Odersky");
 
-        for (Contacts contacts : Contacts.values()) {
-            System.out.println(contacts.getTitle() + ": " + "\n" + resume.getContent(contacts) + "\n");
+        for (ContactType contactType : ContactType.values()) {
+            System.out.println(contactType.getTitle() + ": " + "\n" + resume.getContent(contactType) + "\n");
         }
 
         for (SectionType sectionType : SectionType.values()) {
