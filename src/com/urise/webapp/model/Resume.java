@@ -7,12 +7,8 @@ public class Resume {
     private final String uuid;
     private final String fullName;
 
-    Map<ContactType, String> contacts = new HashMap<>();
-    Map<SectionType, AbstractSection> sections = new HashMap<>();
-
-    {
-        sections.put(SectionType.ACHIEVEMENT, )
-    }
+    private final Map<ContactType, String> contacts = new EnumMap<>(ContactType.class);
+    private final Map<SectionType, AbstractSection> sections = new EnumMap<>(SectionType.class);
 
     public Resume(String fullName) {
         this(UUID.randomUUID().toString(), fullName);
@@ -23,20 +19,28 @@ public class Resume {
         this.fullName = fullName;
     }
 
-    public void setContent(Enum section, String text) {
-        if (section instanceof ContactType) {
-            contacts.put((ContactType) section, text);
-        } else if (section.equals(SectionType.PERSONAL) || section.equals(SectionType.OBJECTIVE)) {
-            sections.put((SectionType) section, new TextSection(text));
-        } else if (section.equals(SectionType.ACHIEVEMENT) || section.equals(SectionType.QUALIFICATIONS)) {
-            sections.put((SectionType) section, );
-
-        }
+    public void addContact(ContactType type, String contact) {
+        contacts.put(type, contact);
     }
 
-    public String getContent(Enum section) {
+    public void addSection(SectionType type, AbstractSection section) {
+        sections.put(type, section);
+    }
 
-        return null;
+    public String getContact(ContactType type) {
+        return contacts.get(type);
+    }
+
+    public AbstractSection getSection(SectionType type) {
+        return sections.get(type);
+    }
+
+    public Map<ContactType, String> getContacts() {
+        return contacts;
+    }
+
+    public Map<SectionType, AbstractSection> getSections() {
+        return sections;
     }
 
     public String getUuid() {
