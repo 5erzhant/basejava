@@ -28,9 +28,11 @@ public abstract class AbstractStorage<SK> implements Storage {
 
     protected abstract void doDelete(SK searchKey);
 
-    protected abstract SK findSearchKey(String uuid);
+    protected abstract SK getSearchKey(String uuid);
 
     protected abstract List<Resume> getAll();
+
+    protected abstract boolean isExist(SK searchKey);
 
     public void update(Resume r) {
         LOG.info("Update " + r);
@@ -64,7 +66,7 @@ public abstract class AbstractStorage<SK> implements Storage {
     }
 
     protected SK getExistingSearchKey(String uuid) {
-        SK searchKey = findSearchKey(uuid);
+        SK searchKey = getSearchKey(uuid);
         if (!isExist(searchKey)) {
             LOG.warning("Resume " + uuid + " not exist");
             throw new NotExistStorageException(uuid);
@@ -74,16 +76,12 @@ public abstract class AbstractStorage<SK> implements Storage {
     }
 
     protected SK getNotExistingSearchKey(String uuid) {
-        SK searchKey = findSearchKey(uuid);
+        SK searchKey = getSearchKey(uuid);
         if (isExist(searchKey)) {
             LOG.warning("Resume " + uuid + " already exist");
             throw new ExistStorageException(uuid);
         } else {
             return searchKey;
         }
-    }
-
-    protected boolean isExist(SK searchKey) {
-        return (Integer) searchKey >= 0;
     }
 }

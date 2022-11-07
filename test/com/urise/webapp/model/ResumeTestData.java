@@ -1,12 +1,32 @@
 package com.urise.webapp.model;
 
+import com.urise.webapp.util.DateUtil;
+
 import java.time.LocalDate;
+import java.time.Month;
 
 public class ResumeTestData {
+
     public static void main(String[] args) {
-        String phoneNumber = "+7(921) 855-0482";
+        Resume resume = getResume("uuid1", "Григорий Кислин");
+        for (ContactType contactType : ContactType.values()) {
+            System.out.println(contactType.getTitle() + "\n");
+            System.out.println(resume.getContact(contactType) + "\n");
+        }
+        for (SectionType sectionType : SectionType.values()) {
+            System.out.println(sectionType.getTitle() + "\n");
+            System.out.println(resume.getSection(sectionType) + "\n");
+        }
+    }
+
+    public static Resume getResume(String uuid, String fullName) {
+        String mobile = "+7(921) 855-0482";
         String skype = "skype:grigory.kislin";
         String mail = "gkislin@yandex.ru";
+        String linkedin = "https://www.linkedin.com/in/gkislin";
+        String github = "https://github.com/gkislin";
+        String stackoverflow = "https://stackoverflow.com/users/548473/grigory-kislin";
+        String homepage = "http://gkislin.ru/";
 
         String personal = "Аналитический склад ума, сильная логика, креативность, инициативность. Пурист кода и архитектуры.";
         String objective = "Ведущий стажировок и корпоративного обучения по Java Web и Enterprise технологиям";
@@ -41,7 +61,7 @@ public class ResumeTestData {
         Period period = new Period(begin, end, title, description);
 
         String name = "Java Online Projects";
-        String website = "topjava.ru";
+        String website = "https://javaops.ru/";
         Company company = new Company(name, website);
 
         LocalDate begin2 = LocalDate.of(2014, 10, 1);
@@ -52,7 +72,7 @@ public class ResumeTestData {
         Period period2 = new Period(begin2, end2, title2, description2);
 
         String name2 = "Wrike";
-        String website2 = "wrike.com";
+        String website2 = "https://www.wrike.com/";
         Company company2 = new Company(name2, website2);
 
         company.addPeriod(period);
@@ -62,25 +82,36 @@ public class ResumeTestData {
         companySection.addCompany(company);
         companySection.addCompany(company2);
 
-        Resume resume = new Resume("Григорий Кислин");
-        resume.addContact(ContactType.PHONE_NUMBER, phoneNumber);
+        LocalDate begin3 = DateUtil.of(2013, Month.MARCH);
+        LocalDate end3 = DateUtil.of(2013, Month.MAY);
+        String description3 = "Functional Programming Principles in Scala by Martin Odersky";
+
+        Period educationPeriod = new Period(begin3, end3, "", description3);
+
+        String edName = "Coursera";
+        String edWebsite = "https://www.coursera.org/learn/scala-functional-programming";
+
+        Company edCompany = new Company(edName, edWebsite);
+        edCompany.addPeriod(educationPeriod);
+
+        CompanySection edCompanySection = new CompanySection();
+        edCompanySection.addCompany(edCompany);
+
+
+        Resume resume = new Resume(uuid, fullName);
+        resume.addContact(ContactType.PHONE, mobile);
         resume.addContact(ContactType.SKYPE, skype);
         resume.addContact(ContactType.MAIL, mail);
+        resume.addContact(ContactType.LINKEDIN, linkedin);
+        resume.addContact(ContactType.GITHUB, github);
+        resume.addContact(ContactType.STACKOVERFLOW, stackoverflow);
+        resume.addContact(ContactType.HOME_PAGE, homepage);
         resume.addSection(SectionType.PERSONAL, personalSection);
         resume.addSection(SectionType.OBJECTIVE, objectiveSection);
         resume.addSection(SectionType.ACHIEVEMENT, achievmentList);
         resume.addSection(SectionType.QUALIFICATIONS, qualificationList);
         resume.addSection(SectionType.EXPERIENCE, companySection);
-
-        for (ContactType contactType : ContactType.values()) {
-            System.out.println(contactType.getTitle() + "\n");
-            System.out.println(resume.getContact(contactType) + "\n");
-        }
-        for (SectionType sectionType : SectionType.values()) {
-            System.out.println(sectionType.getTitle() + "\n");
-            System.out.println(resume.getSection(sectionType) + "\n");
-        }
-
-
+        resume.addSection(SectionType.EDUCATION, edCompanySection);
+        return resume;
     }
 }

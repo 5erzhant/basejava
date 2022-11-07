@@ -24,7 +24,7 @@ public class Company {
     }
 
     public List<Period> getPeriods() {
-        return new ArrayList<>(periods);
+        return periods;
     }
 
     public void addPeriod(Period period) {

@@ -57,4 +57,10 @@ public abstract class AbstractArrayStorage extends AbstractStorage<Integer> {
         Resume[] getAll = Arrays.copyOf(storage, countResumes);
         return new ArrayList<>(Arrays.asList(getAll));
     }
+
+    @Override
+    protected boolean isExist(Integer searchKey) {
+        return searchKey >= 0;
+    }
+
 }
