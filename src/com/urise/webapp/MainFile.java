@@ -29,21 +29,21 @@ public class MainFile {
             throw new RuntimeException(e);
         }
         System.out.println("Рекурсивный обход: ");
-        recursion(directory);
+        recursion(directory, "");
     }
 
-    public static void recursion(File file) {
-        if (file.isDirectory()) {
-            System.out.println(file.getName());
-            for (File f : Objects.requireNonNull(file.listFiles())) {
+    public static void recursion(File directory, String s) {
+        if (directory.isDirectory()) {
+            System.out.println(s + directory.getName());
+            for (File f : Objects.requireNonNull(directory.listFiles())) {
                 if (f.isDirectory()) {
-                    recursion(f);
+                    recursion(f, s + "  ");
                 } else {
-                    System.out.println(f.getName());
+                    System.out.println(s + "  " + f.getName());
                 }
             }
         } else {
-            System.out.println(file.getName());
+            System.out.println(directory.getName());
         }
     }
 }
