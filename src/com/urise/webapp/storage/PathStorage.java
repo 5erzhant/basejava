@@ -2,6 +2,7 @@ package com.urise.webapp.storage;
 
 import com.urise.webapp.exception.StorageException;
 import com.urise.webapp.model.Resume;
+import com.urise.webapp.storage.serialization.SerializationStrategy;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -9,13 +10,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 
 public class PathStorage extends AbstractStorage<Path> {
     private final Path directory;
-
-    SerializationStrategy strategy;
+    private SerializationStrategy strategy;
 
     protected PathStorage(String dir, SerializationStrategy strategy) {
         directory = Paths.get(dir);
@@ -26,12 +27,16 @@ public class PathStorage extends AbstractStorage<Path> {
         this.strategy = strategy;
     }
 
+    public void setStrategy(SerializationStrategy strategy) {
+        this.strategy = strategy;
+    }
+
     @Override
     protected void doUpdate(Resume r, Path searchKey) {
         try {
             strategy.doWrite(r, new BufferedOutputStream(new FileOutputStream(String.valueOf(searchKey))));
         } catch (IOException e) {
-            throw new StorageException("IO Error", null);
+            throw new StorageException("File not found", searchKey.toString());
         }
     }
 
@@ -40,7 +45,7 @@ public class PathStorage extends AbstractStorage<Path> {
         try {
             return strategy.doRead(new BufferedInputStream(new FileInputStream(String.valueOf(searchKey))));
         } catch (IOException e) {
-            throw new StorageException("IO Error", null);
+            throw new StorageException("File not found", searchKey.toString());
         }
     }
 
@@ -48,10 +53,10 @@ public class PathStorage extends AbstractStorage<Path> {
     protected void doSave(Resume r, Path searchKey) {
         try {
             Files.createFile(searchKey);
-            strategy.doWrite(r, new BufferedOutputStream(new FileOutputStream(String.valueOf(searchKey))));
         } catch (IOException e) {
-            throw new StorageException("IO Error", null);
+            throw new StorageException("File not created", searchKey.toString());
         }
+        doUpdate(r, searchKey);
     }
 
     @Override
@@ -59,7 +64,7 @@ public class PathStorage extends AbstractStorage<Path> {
         try {
             Files.delete(searchKey);
         } catch (IOException e) {
-            throw new StorageException("IO Error", null);
+            throw new StorageException("File not deleted", searchKey.toString());
         }
     }
 
@@ -71,17 +76,7 @@ public class PathStorage extends AbstractStorage<Path> {
     @Override
     protected List<Resume> getAll() {
         List<Resume> list = new ArrayList<>();
-        try {
-            Files.list(directory).forEach(path -> {
-                try {
-                    list.add(strategy.doRead(new BufferedInputStream(new FileInputStream(String.valueOf(path)))));
-                } catch (IOException e) {
-                    throw new StorageException("IO Error", null);
-                }
-            });
-        } catch (IOException e) {
-            throw new StorageException("IO Error", null);
-        }
+        getFilesList(directory).forEach(path -> list.add(doGet(path)));
         return list;
     }
 
@@ -92,19 +87,19 @@ public class PathStorage extends AbstractStorage<Path> {
 
     @Override
     public void clear() {
-        try {
-            Files.list(directory).forEach(path -> doDelete(path));
-        } catch (IOException e) {
-            throw new StorageException("Path delete error", null);
-        }
+        getFilesList(directory).forEach(this::doDelete);
     }
 
     @Override
     public int size() {
+        return getFilesList(directory).toList().size();
+    }
+
+    public Stream<Path> getFilesList(Path directory) {
         try {
-            return Files.list(directory).toList().size();
+            return Files.list(directory);
         } catch (IOException e) {
-            throw new StorageException("IO Error", null);
+            throw new StorageException("Directory error", directory.toString());
         }
     }
 }

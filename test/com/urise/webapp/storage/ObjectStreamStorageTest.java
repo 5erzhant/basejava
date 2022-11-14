@@ -1,5 +1,6 @@
 package com.urise.webapp.storage;
 
+import com.urise.webapp.storage.serialization.ObjectStreamStorage;
 import org.junit.Test;
 
 public class ObjectStreamStorageTest extends AbstractStorageTest {

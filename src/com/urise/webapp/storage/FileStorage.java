@@ -2,6 +2,7 @@ package com.urise.webapp.storage;
 
 import com.urise.webapp.exception.StorageException;
 import com.urise.webapp.model.Resume;
+import com.urise.webapp.storage.serialization.SerializationStrategy;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -12,8 +13,6 @@ import static java.util.Objects.requireNonNull;
 
 public class FileStorage extends AbstractStorage<File> {
     private final File directory;
-    private final File[] files;
-
     private SerializationStrategy strategy;
 
     protected FileStorage(File directory, SerializationStrategy strategy) {
@@ -25,7 +24,6 @@ public class FileStorage extends AbstractStorage<File> {
             throw new IllegalArgumentException(directory.getAbsolutePath() + "is not readable/writeable");
         }
         this.directory = directory;
-        files = directory.listFiles();
         this.strategy = strategy;
     }
 
@@ -38,7 +36,7 @@ public class FileStorage extends AbstractStorage<File> {
         try {
             strategy.doWrite(r, new BufferedOutputStream(new FileOutputStream(file)));
         } catch (IOException e) {
-            throw new StorageException("IO Error", file.getName(), e);
+            throw new StorageException("File not found", file.getName());
         }
     }
 
@@ -47,7 +45,7 @@ public class FileStorage extends AbstractStorage<File> {
         try {
             return strategy.doRead(new BufferedInputStream(new FileInputStream(file)));
         } catch (IOException e) {
-            throw new StorageException("IO Error", file.getName(), e);
+            throw new StorageException("File not found", file.getName());
         }
     }
 
@@ -55,16 +53,16 @@ public class FileStorage extends AbstractStorage<File> {
     protected void doSave(Resume r, File file) {
         try {
             file.createNewFile();
-            strategy.doWrite(r, new BufferedOutputStream(new FileOutputStream(file)));
         } catch (IOException e) {
-            throw new StorageException("IO Error ", file.getName(), e);
+            throw new StorageException("File not created", file.getName());
         }
+        doUpdate(r, file);
     }
 
     @Override
     protected void doDelete(File file) {
         if (!file.delete()) {
-            throw new StorageException("Not deleted", file.getName());
+            throw new StorageException("File not deleted", file.getName());
         }
     }
 
@@ -76,15 +74,10 @@ public class FileStorage extends AbstractStorage<File> {
     @Override
     protected List<Resume> getAll() {
         List<Resume> list = new ArrayList<>();
-        if (isNull(files)) {
-            throw new StorageException("Directory is null", directory.getName());
-        }
-        for (File file : directory.listFiles()) {
-            try {
-                list.add(strategy.doRead(new BufferedInputStream(new FileInputStream(file))));
-            } catch (IOException e) {
-                throw new StorageException("IO Error", file.getName(), e);
-            }
+        File[] files = directory.listFiles();
+        isNotNull(files);
+        for (File file : files) {
+            list.add(doGet(file));
         }
         return list;
     }
@@ -96,19 +89,23 @@ public class FileStorage extends AbstractStorage<File> {
 
     @Override
     public void clear() {
-        if (isNull(files)) {
-            throw new StorageException("Directory is null", directory.getName());
-        }
-        for (File file : directory.listFiles()) {
+        File[] files = directory.listFiles();
+        isNotNull(files);
+        for (File file : files) {
             doDelete(file);
         }
     }
 
     @Override
     public int size() {
+        File[] files = directory.listFiles();
+        isNotNull(files);
+        return files.length;
+    }
+
+    public void isNotNull(File[] files) {
         if (isNull(files)) {
             throw new StorageException("Directory is null", directory.getName());
         }
-        return directory.listFiles().length;
     }
 }
