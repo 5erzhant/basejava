@@ -36,7 +36,7 @@ public class FileStorage extends AbstractStorage<File> {
         try {
             strategy.doWrite(r, new BufferedOutputStream(new FileOutputStream(file)));
         } catch (IOException e) {
-            throw new StorageException("File not found", file.getName());
+            throw new StorageException("File not updated", file.getName());
         }
     }
 
@@ -54,7 +54,7 @@ public class FileStorage extends AbstractStorage<File> {
         try {
             file.createNewFile();
         } catch (IOException e) {
-            throw new StorageException("File not created", file.getName());
+            throw new StorageException("File not saved", file.getName());
         }
         doUpdate(r, file);
     }
@@ -74,9 +74,7 @@ public class FileStorage extends AbstractStorage<File> {
     @Override
     protected List<Resume> getAll() {
         List<Resume> list = new ArrayList<>();
-        File[] files = directory.listFiles();
-        isNotNull(files);
-        for (File file : files) {
+        for (File file : getFiles(directory)) {
             list.add(doGet(file));
         }
         return list;
@@ -89,23 +87,21 @@ public class FileStorage extends AbstractStorage<File> {
 
     @Override
     public void clear() {
-        File[] files = directory.listFiles();
-        isNotNull(files);
-        for (File file : files) {
+        for (File file : getFiles(directory)) {
             doDelete(file);
         }
     }
 
     @Override
     public int size() {
-        File[] files = directory.listFiles();
-        isNotNull(files);
-        return files.length;
+        return getFiles(directory).length;
     }
 
-    public void isNotNull(File[] files) {
+    public File[] getFiles(File directory) {
+        File[] files = directory.listFiles();
         if (isNull(files)) {
             throw new StorageException("Directory is null", directory.getName());
         }
+        return files;
     }
 }

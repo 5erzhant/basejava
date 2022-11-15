@@ -36,7 +36,7 @@ public class PathStorage extends AbstractStorage<Path> {
         try {
             strategy.doWrite(r, new BufferedOutputStream(new FileOutputStream(String.valueOf(searchKey))));
         } catch (IOException e) {
-            throw new StorageException("File not found", searchKey.toString());
+            throw new StorageException("File not updated", searchKey.toString());
         }
     }
 
@@ -54,7 +54,7 @@ public class PathStorage extends AbstractStorage<Path> {
         try {
             Files.createFile(searchKey);
         } catch (IOException e) {
-            throw new StorageException("File not created", searchKey.toString());
+            throw new StorageException("File not saved", searchKey.toString());
         }
         doUpdate(r, searchKey);
     }
@@ -70,7 +70,7 @@ public class PathStorage extends AbstractStorage<Path> {
 
     @Override
     protected Path getSearchKey(String uuid) {
-        return Paths.get(String.valueOf(directory), uuid);
+        return Path.of(String.valueOf(directory)).resolve(Path.of(uuid));
     }
 
     @Override
