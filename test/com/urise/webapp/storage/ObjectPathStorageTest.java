@@ -3,10 +3,10 @@ package com.urise.webapp.storage;
 import com.urise.webapp.storage.serialization.ObjectStreamStrategy;
 import org.junit.Test;
 
-public class ObjectStreamFileTest extends AbstractStorageTest {
+public class ObjectPathStorageTest extends AbstractStorageTest {
 
-    public ObjectStreamFileTest() {
-        super(new FileStorage(STORAGE_DIR, new ObjectStreamStrategy()));
+    public ObjectPathStorageTest() {
+        super(new PathStorage(STORAGE_DIR.toString(), new ObjectStreamStrategy()));
     }
 
     @Override
