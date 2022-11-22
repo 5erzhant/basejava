@@ -1,6 +1,6 @@
 package com.urise.webapp.model;
 
-import com.urise.webapp.util.LocalDateAdapter;
+import com.urise.webapp.util.XmlLocalDateAdapter;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -15,9 +15,10 @@ public class Period implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @XmlJavaTypeAdapter(LocalDateAdapter.class)
+    @XmlJavaTypeAdapter(XmlLocalDateAdapter.class)
     private LocalDate begin;
-    @XmlJavaTypeAdapter(LocalDateAdapter.class)
+
+    @XmlJavaTypeAdapter(XmlLocalDateAdapter.class)
     private LocalDate end;
     private String title;
     private String description;
