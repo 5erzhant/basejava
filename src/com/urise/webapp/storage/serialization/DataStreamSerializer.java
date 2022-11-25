@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class DataStreamSerializer implements StreamSerializer {
     @Override
-    public void doWrite(Resume r, OutputStream outputStream) throws IOException {
+    public void doWrite(Resume r, OutputStream outputStream) {
         try (DataOutputStream dos = new DataOutputStream(outputStream)) {
             dos.writeUTF(r.getUuid());
             dos.writeUTF(r.getFullName());
@@ -39,12 +39,13 @@ public class DataStreamSerializer implements StreamSerializer {
                     default -> throw new IllegalStateException("Unexpected value: " + entry.getValue());
                 }
             }
-
+        } catch (IOException e) {
+            throw new StorageException("Write object error", null);
         }
     }
 
     @Override
-    public Resume doRead(InputStream inputStream) throws IOException {
+    public Resume doRead(InputStream inputStream) {
         try (DataInputStream dis = new DataInputStream(inputStream)) {
             String uuid = dis.readUTF();
             String fullName = dis.readUTF();
@@ -66,6 +67,8 @@ public class DataStreamSerializer implements StreamSerializer {
                 resume.addSection(SectionType.valueOf(sectionName), as);
             }
             return resume;
+        } catch (IOException e) {
+            throw new StorageException("Read object error", null);
         }
     }
 
