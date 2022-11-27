@@ -17,26 +17,28 @@ public class DataStreamSerializer implements StreamSerializer {
             dos.writeUTF(r.getUuid());
             dos.writeUTF(r.getFullName());
             Map<ContactType, String> contacts = r.getContacts();
-
-            CustomConsumer<Map.Entry<ContactType, String>> action = entry -> {
+            CustomConsumer<Map.Entry<ContactType, String>> actionContact = entry -> {
                 dos.writeUTF(entry.getKey().name());
                 dos.writeUTF(entry.getValue());
             };
-            writeWithException(contacts.entrySet(), dos, action);
+            writeWithException(contacts.entrySet(), dos, actionContact);
 
             Map<SectionType, AbstractSection> sections = r.getSections();
-            dos.writeInt(sections.size());
-            for (Map.Entry<SectionType, AbstractSection> entry : sections.entrySet()) {
+            CustomConsumer<Map.Entry<SectionType, AbstractSection>> actionSection = entry -> {
                 AbstractSection section = entry.getValue();
                 SectionType type = entry.getKey();
                 dos.writeUTF(type.name());
                 switch (type) {
-                    case PERSONAL, OBJECTIVE -> writeTextSection((TextSection) section, dos);
+                    case PERSONAL, OBJECTIVE -> {
+                        TextSection ts = (TextSection) section;
+                        dos.writeUTF(ts.getContent());
+                    }
                     case ACHIEVEMENT, QUALIFICATIONS -> writeListSection((ListSection) section, dos);
                     case EXPERIENCE, EDUCATION -> writeCompanySection((CompanySection) section, dos);
                     default -> throw new IllegalStateException("Unexpected value: " + entry.getValue());
                 }
-            }
+            };
+            writeWithException(sections.entrySet(), dos, actionSection);
         } catch (IOException e) {
             throw new StorageException("Write object error", null);
         }
@@ -56,7 +58,7 @@ public class DataStreamSerializer implements StreamSerializer {
             for (int i = 0; i < sizeSections; i++) {
                 SectionType type = SectionType.valueOf(dis.readUTF());
                 AbstractSection section = switch (type) {
-                    case PERSONAL, OBJECTIVE -> readTextSection(dis);
+                    case PERSONAL, OBJECTIVE -> new TextSection(dis.readUTF());
                     case ACHIEVEMENT, QUALIFICATIONS -> readListSection(dis);
                     case EXPERIENCE, EDUCATION -> readCompanySection(dis);
                 };
@@ -68,42 +70,26 @@ public class DataStreamSerializer implements StreamSerializer {
         }
     }
 
-    private void writeCompanySection(CompanySection cs, DataOutputStream dos) {
-        try {
-            dos.writeInt(cs.getCompanies().size());
-            for (Company company : cs.getCompanies()) {
-                dos.writeUTF(company.getName());
-                dos.writeUTF(company.getWebsite() != null ? company.getWebsite() : "no site");
-                dos.writeInt(company.getPeriods().size());
-                for (Period period : company.getPeriods()) {
-                    dos.writeUTF(period.getBegin().toString());
-                    dos.writeUTF(period.getEnd().toString());
-                    dos.writeUTF(period.getTitle());
-                    dos.writeUTF(period.getDescription() != null ? period.getDescription() : "no description");
-                }
-            }
-        } catch (IOException e) {
-            throw new StorageException("Company section not written", null);
-        }
+    private void writeCompanySection(CompanySection cs, DataOutputStream dos) throws IOException {
+        CustomConsumer<Period> actionPeriod = period -> {
+            dos.writeUTF(period.getBegin().toString());
+            dos.writeUTF(period.getEnd().toString());
+            dos.writeUTF(period.getTitle());
+            dos.writeUTF(period.getDescription() != null ? period.getDescription() : "no description");
+        };
+
+        CustomConsumer<Company> actionCompany = company -> {
+            dos.writeUTF(company.getName());
+            dos.writeUTF(company.getWebsite() != null ? company.getWebsite() : "no site");
+            writeWithException(company.getPeriods(), dos, actionPeriod);
+        };
+        writeWithException(cs.getCompanies(), dos, actionCompany);
     }
 
-    private void writeListSection(ListSection ls, DataOutputStream dos) {
-        try {
-            dos.writeInt(ls.getContentList().size());
-            for (String str : ls.getContentList()) {
-                dos.writeUTF(str);
-            }
-        } catch (IOException e) {
-            throw new StorageException("List section not written", null);
-        }
-    }
-
-    private void writeTextSection(TextSection ts, DataOutputStream dos) {
-        try {
-            dos.writeUTF(ts.getContent());
-        } catch (IOException e) {
-            throw new StorageException("Text section not written", null);
-        }
+    private void writeListSection(ListSection ls, DataOutputStream dos) throws IOException {
+//      CustomConsumer<String> action = str -> dos.writeUTF(str);
+        CustomConsumer<String> action = dos::writeUTF;
+        writeWithException(ls.getContentList(), dos, action);
     }
 
     private CompanySection readCompanySection(DataInputStream dis) {
@@ -153,16 +139,6 @@ public class DataStreamSerializer implements StreamSerializer {
             throw new StorageException("Read ListSection Error", null);
         }
         return ls;
-    }
-
-    private TextSection readTextSection(DataInputStream dis) {
-        TextSection ts;
-        try {
-            ts = new TextSection(dis.readUTF());
-        } catch (IOException e) {
-            throw new StorageException("Read TextSection Error", null);
-        }
-        return ts;
     }
 
     private <T> void writeWithException(Collection<T> collection, DataOutputStream dos, CustomConsumer<T> action)
