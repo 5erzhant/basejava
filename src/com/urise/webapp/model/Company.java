@@ -20,6 +20,10 @@ public class Company implements Serializable {
     public Company() {
     }
 
+    public Company(String name) {
+        this.name = name;
+    }
+
     public Company(String name, String website) {
         this.name = name;
         this.website = website;

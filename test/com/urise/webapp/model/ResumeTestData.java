@@ -58,7 +58,7 @@ public class ResumeTestData {
         LocalDate end = LocalDate.now();
         String title = "Автор проекта";
         String description = "Создание, организация и проведение Java онлайн проектов и стажировок.";
-        Period period = new Period(begin, end, title, description);
+        Period period = new Period(begin, end, title);
 
         String name = "Java Online Projects";
         String website = "https://javaops.ru/";
@@ -73,7 +73,7 @@ public class ResumeTestData {
 
         String name2 = "Wrike";
         String website2 = "https://www.wrike.com/";
-        Company company2 = new Company(name2, website2);
+        Company company2 = new Company(name2);
 
         company.addPeriod(period);
         company2.addPeriod(period2);
