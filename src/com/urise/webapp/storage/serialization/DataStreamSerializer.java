@@ -2,13 +2,13 @@ package com.urise.webapp.storage.serialization;
 
 import com.urise.webapp.exception.StorageException;
 import com.urise.webapp.model.*;
+import com.urise.webapp.util.CustomConsumer;
 
 import java.io.*;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 public class DataStreamSerializer implements StreamSerializer {
     @Override
@@ -17,18 +17,10 @@ public class DataStreamSerializer implements StreamSerializer {
             dos.writeUTF(r.getUuid());
             dos.writeUTF(r.getFullName());
             Map<ContactType, String> contacts = r.getContacts();
-            dos.writeInt(contacts.size());
-//            for (Map.Entry<ContactType, String> entry : contacts.entrySet()) {
-//                dos.writeUTF(entry.getKey().name());
-//                dos.writeUTF(entry.getValue());
 
-            Consumer<Map.Entry<ContactType, String>> action = entry -> {
-                try {
-                    dos.writeUTF(entry.getKey().name());
-                    dos.writeUTF(entry.getValue());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+            CustomConsumer<Map.Entry<ContactType, String>> action = entry -> {
+                dos.writeUTF(entry.getKey().name());
+                dos.writeUTF(entry.getValue());
             };
             writeWithException(contacts.entrySet(), dos, action);
 
@@ -36,21 +28,12 @@ public class DataStreamSerializer implements StreamSerializer {
             dos.writeInt(sections.size());
             for (Map.Entry<SectionType, AbstractSection> entry : sections.entrySet()) {
                 AbstractSection section = entry.getValue();
-                String className = section.getClass().getName();
-                dos.writeUTF(entry.getKey().name());
-                switch (entry.getKey()) {
-                    case PERSONAL, OBJECTIVE -> {
-                        dos.writeUTF(className);
-                        writeTextSection((TextSection) section, dos);
-                    }
-                    case ACHIEVEMENT, QUALIFICATIONS -> {
-                        dos.writeUTF(className);
-                        writeListSection((ListSection) section, dos);
-                    }
-                    case EXPERIENCE, EDUCATION -> {
-                        dos.writeUTF(className);
-                        writeCompanySection((CompanySection) section, dos);
-                    }
+                SectionType type = entry.getKey();
+                dos.writeUTF(type.name());
+                switch (type) {
+                    case PERSONAL, OBJECTIVE -> writeTextSection((TextSection) section, dos);
+                    case ACHIEVEMENT, QUALIFICATIONS -> writeListSection((ListSection) section, dos);
+                    case EXPERIENCE, EDUCATION -> writeCompanySection((CompanySection) section, dos);
                     default -> throw new IllegalStateException("Unexpected value: " + entry.getValue());
                 }
             }
@@ -71,15 +54,13 @@ public class DataStreamSerializer implements StreamSerializer {
             }
             int sizeSections = dis.readInt();
             for (int i = 0; i < sizeSections; i++) {
-                String sectionName = dis.readUTF();
-                String className = dis.readUTF();
-                AbstractSection as = switch (className) {
-                    case "com.urise.webapp.model.TextSection" -> readTextSection(dis);
-                    case "com.urise.webapp.model.ListSection" -> readListSection(dis);
-                    case "com.urise.webapp.model.CompanySection" -> readCompanySection(dis);
-                    default -> throw new IllegalStateException("Unexpected value: " + className);
+                SectionType type = SectionType.valueOf(dis.readUTF());
+                AbstractSection section = switch (type) {
+                    case PERSONAL, OBJECTIVE -> readTextSection(dis);
+                    case ACHIEVEMENT, QUALIFICATIONS -> readListSection(dis);
+                    case EXPERIENCE, EDUCATION -> readCompanySection(dis);
                 };
-                resume.addSection(SectionType.valueOf(sectionName), as);
+                resume.addSection(type, section);
             }
             return resume;
         } catch (IOException e) {
@@ -184,8 +165,10 @@ public class DataStreamSerializer implements StreamSerializer {
         return ts;
     }
 
-    private <T> void writeWithException(Collection<T> collection, DataOutputStream dos, Consumer<T> action) {
+    private <T> void writeWithException(Collection<T> collection, DataOutputStream dos, CustomConsumer<T> action)
+            throws IOException {
         Objects.requireNonNull(action);
+        dos.writeInt(collection.size());
         for (T entry : collection) {
             action.accept(entry);
         }
