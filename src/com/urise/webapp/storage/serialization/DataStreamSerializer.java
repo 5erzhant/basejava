@@ -50,20 +50,20 @@ public class DataStreamSerializer implements StreamSerializer {
             String uuid = dis.readUTF();
             String fullName = dis.readUTF();
             Resume resume = new Resume(uuid, fullName);
-            int sizeContacts = dis.readInt();
-            for (int i = 0; i < sizeContacts; i++) {
-                resume.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF());
-            }
-            int sizeSections = dis.readInt();
-            for (int i = 0; i < sizeSections; i++) {
+
+            CustomConsumer<Object> actionContacts = o -> resume.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF());
+            readWithException(null, dis, actionContacts);
+
+            CustomConsumer<Object> actionSection = o -> {
                 SectionType type = SectionType.valueOf(dis.readUTF());
                 AbstractSection section = switch (type) {
                     case PERSONAL, OBJECTIVE -> new TextSection(dis.readUTF());
-                    case ACHIEVEMENT, QUALIFICATIONS -> readListSection(dis);
-                    case EXPERIENCE, EDUCATION -> readCompanySection(dis);
+                    case ACHIEVEMENT, QUALIFICATIONS -> DataStreamSerializer.this.readListSection(dis);
+                    case EXPERIENCE, EDUCATION -> DataStreamSerializer.this.readCompanySection(dis);
                 };
                 resume.addSection(type, section);
-            }
+            };
+            readWithException(null, dis, actionSection);
             return resume;
         } catch (IOException e) {
             throw new StorageException("Read object error", null);
@@ -92,52 +92,44 @@ public class DataStreamSerializer implements StreamSerializer {
         writeWithException(ls.getContentList(), dos, action);
     }
 
-    private CompanySection readCompanySection(DataInputStream dis) {
+    private CompanySection readCompanySection(DataInputStream dis) throws IOException {
         CompanySection cs = new CompanySection();
-        try {
-            int sizeCompanies = dis.readInt();
-            for (int i = 0; i < sizeCompanies; i++) {
-                String name = dis.readUTF();
-                String webSite = dis.readUTF();
-                Company company;
-                if (!webSite.equals("no site")) {
-                    company = new Company(name, webSite);
-                } else {
-                    company = new Company(name);
-                }
-                int sizePeriods = dis.readInt();
-                for (int j = 0; j < sizePeriods; j++) {
-                    LocalDate begin = LocalDate.parse(dis.readUTF());
-                    LocalDate end = LocalDate.parse(dis.readUTF());
-                    String title = dis.readUTF();
-                    String description = dis.readUTF();
-                    Period period;
-                    if (!description.equals("no description")) {
-                        period = new Period(begin, end, title, description);
-                    } else {
-                        period = new Period(begin, end, title);
-                    }
-                    company.addPeriod(period);
-                }
-                cs.addCompany(company);
+
+        CustomConsumer<Object> actionPeriods = o -> {
+            LocalDate begin = LocalDate.parse(dis.readUTF());
+            LocalDate end = LocalDate.parse(dis.readUTF());
+            String title = dis.readUTF();
+            String description = dis.readUTF();
+            Period period;
+            if (!description.equals("no description")) {
+                period = new Period(begin, end, title, description);
+            } else {
+                period = new Period(begin, end, title);
             }
-        } catch (IOException e) {
-            throw new StorageException("Read CompanySection Error", null);
-        }
+            Company company = (Company) o;
+            company.addPeriod(period);
+        };
+
+        CustomConsumer<Object> actionCompanies = o -> {
+            String name = dis.readUTF();
+            String webSite = dis.readUTF();
+            Company company;
+            if (!webSite.equals("no site")) {
+                company = new Company(name, webSite);
+            } else {
+                company = new Company(name);
+            }
+            readWithException(company, dis, actionPeriods);
+            cs.addCompany(company);
+        };
+        readWithException(null, dis, actionCompanies);
         return cs;
     }
 
-    private ListSection readListSection(DataInputStream dis) {
-        ListSection ls;
-        try {
-            ls = new ListSection();
-            int size = dis.readInt();
-            for (int i = 0; i < size; i++) {
-                ls.addContent(dis.readUTF());
-            }
-        } catch (IOException e) {
-            throw new StorageException("Read ListSection Error", null);
-        }
+    private ListSection readListSection(DataInputStream dis) throws IOException {
+        ListSection ls = new ListSection();
+        CustomConsumer<Object> action = object -> ls.addContent(dis.readUTF());
+        readWithException(null, dis, action);
         return ls;
     }
 
@@ -147,6 +139,15 @@ public class DataStreamSerializer implements StreamSerializer {
         dos.writeInt(collection.size());
         for (T entry : collection) {
             action.accept(entry);
+        }
+    }
+
+    private void readWithException(Object o, DataInputStream dis, CustomConsumer<Object> action)
+            throws IOException {
+        Objects.requireNonNull(action);
+        int size = dis.readInt();
+        for (int i = 0; i < size; i++) {
+            action.accept(o);
         }
     }
 }
