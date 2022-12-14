@@ -1,5 +1,6 @@
 package com.urise.webapp.storage;
 
+import com.urise.webapp.Config;
 import com.urise.webapp.exception.ExistStorageException;
 import com.urise.webapp.exception.NotExistStorageException;
 import com.urise.webapp.exception.StorageException;
@@ -15,7 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public abstract class AbstractStorageTest {
-    protected static final File STORAGE_DIR = new File("C:\\Users\\Alexander\\Desktop\\Java\\basejava\\storage");
+    protected static final File STORAGE_DIR = Config.get().getStorageDir();
 
     private final Storage storage;
     protected static final String UUID_1 = "uuid3";
