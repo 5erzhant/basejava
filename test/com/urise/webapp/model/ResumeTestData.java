@@ -15,13 +15,13 @@ public class ResumeTestData {
     }
 
     public static Resume getResume(String uuid, String fullName) {
-//        String mobile = "+7(921) 855-0482";
-//        String skype = "skype:grigory.kislin";
-//        String mail = "gkislin@yandex.ru";
-//        String linkedin = "https://www.linkedin.com/in/gkislin";
-//        String github = "https://github.com/gkislin";
-//        String stackoverflow = "https://stackoverflow.com/users/548473/grigory-kislin";
-//        String homepage = "http://gkislin.ru/";
+        String mobile = "+7(921) 855-0482";
+        String skype = "skype:grigory.kislin";
+        String mail = "gkislin@yandex.ru";
+        String linkedin = "https://www.linkedin.com/in/gkislin";
+        String github = "https://github.com/gkislin";
+        String stackoverflow = "https://stackoverflow.com/users/548473/grigory-kislin";
+        String homepage = "http://gkislin.ru/";
 //
 //        String personal = "Аналитический склад ума, сильная логика, креативность, инициативность. Пурист кода и архитектуры.";
 //        String objective = "Ведущий стажировок и корпоративного обучения по Java Web и Enterprise технологиям";
@@ -94,13 +94,13 @@ public class ResumeTestData {
 //
 //
         Resume resume = new Resume(uuid, fullName);
-//        resume.addContact(ContactType.PHONE, mobile);
-//        resume.addContact(ContactType.SKYPE, skype);
-//        resume.addContact(ContactType.MAIL, mail);
-//        resume.addContact(ContactType.LINKEDIN, linkedin);
-//        resume.addContact(ContactType.GITHUB, github);
-//        resume.addContact(ContactType.STACKOVERFLOW, stackoverflow);
-//        resume.addContact(ContactType.HOME_PAGE, homepage);
+        resume.addContact(ContactType.PHONE, mobile);
+        resume.addContact(ContactType.SKYPE, skype);
+        resume.addContact(ContactType.MAIL, mail);
+        resume.addContact(ContactType.LINKEDIN, linkedin);
+        resume.addContact(ContactType.GITHUB, github);
+        resume.addContact(ContactType.STACKOVERFLOW, stackoverflow);
+        resume.addContact(ContactType.HOME_PAGE, homepage);
 //        resume.addSection(SectionType.PERSONAL, personalSection);
 //        resume.addSection(SectionType.OBJECTIVE, objectiveSection);
 //        resume.addSection(SectionType.ACHIEVEMENT, achievmentList);
