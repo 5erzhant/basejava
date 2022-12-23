@@ -22,7 +22,7 @@ public class SqlStorage implements Storage {
 
     @Override
     public void clear() {
-        sqlHelper.execute("delete from resume", ps -> {
+        sqlHelper.execute("DELETE FROM resume", ps -> {
             ps.execute();
             return null;
         });
@@ -32,10 +32,10 @@ public class SqlStorage implements Storage {
     public Resume get(String uuid) {
         LOG.info("Get " + uuid);
         return sqlHelper.execute("" +
-                "select * from resume r " +
-                "  left join contact c " +
-                "    on r.uuid = c.resume_uuid" +
-                " where r.uuid =?", ps -> {
+                "SELECT * FROM resume r " +
+                "  LEFT JOIN contact c " +
+                "    ON r.uuid = c.resume_uuid" +
+                " WHERE r.uuid =?", ps -> {
             ps.setString(1, uuid);
             ResultSet rs = ps.executeQuery();
             if (!rs.next()) {
@@ -43,9 +43,8 @@ public class SqlStorage implements Storage {
             }
             Resume r = new Resume(uuid, rs.getString("full_name"));
             do {
-                String value = rs.getString("value");
-                ContactType contactType = ContactType.valueOf(rs.getString("type"));
-                r.addContact(contactType, value);
+                r.addContact(ContactType.valueOf(rs.getString("type")),
+                        rs.getString("value") == null ? "" : rs.getString("value"));
             } while (rs.next());
             return r;
         });
@@ -54,20 +53,28 @@ public class SqlStorage implements Storage {
     @Override
     public void update(Resume r) {
         LOG.info("Update " + r);
-        sqlHelper.transactionalExecute(conn -> {
-            if (changeTable("update resume set full_name = ? where uuid = ?",
-                    "update contact set value = ? where resume_uuid = ? and type = ?", conn, r) == 0)
-                throw new NotExistStorageException(r.getUuid());
-            return null;
-        });
+        delete(r.getUuid());
+        save(r);
     }
 
     @Override
     public void save(Resume r) {
         LOG.info("Save " + r);
         sqlHelper.transactionalExecute(conn -> {
-            changeTable("insert into resume (full_name, uuid) values (?,?)",
-                    "insert into contact (value, resume_uuid, type) values (?,?,?)", conn, r);
+            try (PreparedStatement ps = conn.prepareStatement("INSERT INTO resume (full_name, uuid) VALUES (?,?)")) {
+                ps.setString(1, r.getFullName());
+                ps.setString(2, r.getUuid());
+                ps.execute();
+            }
+            try (PreparedStatement ps = conn.prepareStatement("INSERT INTO contact (value, resume_uuid, type) VALUES (?,?,?)")) {
+                for (Map.Entry<ContactType, String> entrySet : r.getContacts().entrySet()) {
+                    ps.setString(1, entrySet.getValue());
+                    ps.setString(2, r.getUuid());
+                    ps.setString(3, entrySet.getKey().name());
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+            }
             return null;
         });
     }
@@ -75,8 +82,10 @@ public class SqlStorage implements Storage {
     @Override
     public void delete(String uuid) {
         LOG.info("Delete " + uuid);
-        sqlHelper.execute("delete from resume where uuid = ?", ps -> {
+        sqlHelper.execute("DELETE FROM resume WHERE uuid = ?;" +
+                "                 DELETE FROM contact WHERE resume_uuid = ?", ps -> {
             ps.setString(1, uuid);
+            ps.setString(2, uuid);
             if (ps.executeUpdate() == 0) throw new NotExistStorageException(uuid);
             return null;
         });
@@ -87,18 +96,10 @@ public class SqlStorage implements Storage {
         LOG.info("getAllSorted");
         List<Resume> list = new ArrayList<>();
         sqlHelper.transactionalExecute(conn -> {
-            PreparedStatement ps = conn.prepareStatement("select * from resume order by full_name, uuid");
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM resume ORDER BY full_name, uuid");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                ps = conn.prepareStatement("select * from resume r inner join contact c on r.uuid = c.resume_uuid " +
-                        "where r.uuid = ? ");
-                ps.setString(1, rs.getString("uuid"));
-                ResultSet resultSet = ps.executeQuery();
-                resultSet.next();
-                Resume r = new Resume(resultSet.getString("uuid").trim(), resultSet.getString("full_name"));
-                do {
-                    r.addContact(ContactType.valueOf(resultSet.getString("type")), resultSet.getString("value"));
-                } while (resultSet.next());
+                Resume r = get(rs.getString("uuid").trim());
                 list.add(r);
             }
             return null;
@@ -108,29 +109,10 @@ public class SqlStorage implements Storage {
 
     @Override
     public int size() {
-        return sqlHelper.execute("select count(*) from resume", ps -> {
+        return sqlHelper.execute("SELECT COUNT(*) FROM resume", ps -> {
             ResultSet rs = ps.executeQuery();
             rs.next();
             return rs.getInt("count");
         });
-    }
-
-    private int changeTable(String resumeRequest, String contactRequest, Connection conn, Resume r) throws SQLException {
-        int executeUpdate;
-        try (PreparedStatement ps = conn.prepareStatement(resumeRequest)) {
-            ps.setString(1, r.getFullName());
-            ps.setString(2, r.getUuid());
-            executeUpdate = ps.executeUpdate();
-        }
-        try (PreparedStatement ps = conn.prepareStatement(contactRequest)) {
-            for (Map.Entry<ContactType, String> entrySet : r.getContacts().entrySet()) {
-                ps.setString(1, entrySet.getValue());
-                ps.setString(2, r.getUuid());
-                ps.setString(3, entrySet.getKey().name());
-                ps.addBatch();
-            }
-            ps.executeBatch();
-        }
-        return executeUpdate;
     }
 }
