@@ -13,3 +13,10 @@ create table contact
 );
 create unique index contact_uuid_type_index
     on contact (resume_uuid, type);
+
+create table section
+(
+    type        text,
+    value       text,
+    resume_uuid text not null constraint section_resume_uuid_fk references resume
+);

@@ -45,15 +45,15 @@ public class SqlStorage implements Storage {
             if (addResume(conn, "UPDATE resume SET full_name = ? WHERE uuid = ?", r) == 0) {
                 throw new NotExistStorageException(r.getUuid());
             }
-            PreparedStatement ps = conn.prepareStatement("DELETE FROM contact WHERE resume_uuid = ?");
-            ps.setString(1, r.getUuid());
-            ps.execute();
-            addContact(conn, r);
-            ps = conn.prepareStatement("DELETE FROM section WHERE resume_uuid = ?");
-            ps.setString(1, r.getUuid());
-            ps.execute();
-            addSection(conn, r);
-            ps.close();
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM contact WHERE resume_uuid = ?");
+                 PreparedStatement ps2 = conn.prepareStatement("DELETE FROM section WHERE resume_uuid = ?")) {
+                ps.setString(1, r.getUuid());
+                ps.execute();
+                addContact(conn, r);
+                ps2.setString(1, r.getUuid());
+                ps2.execute();
+                addSection(conn, r);
+            }
             return null;
         });
     }
@@ -88,17 +88,17 @@ public class SqlStorage implements Storage {
         LOG.info("getAllSorted");
         List<Resume> list = new ArrayList<>();
         sqlHelper.transactionalExecute(conn -> {
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM resume ORDER BY full_name, uuid");
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                String uuid = rs.getString("uuid").trim();
-                list.add(createResume(uuid, conn));
+            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM resume ORDER BY full_name, uuid")) {
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    String uuid = rs.getString("uuid").trim();
+                    list.add(createResume(uuid, conn));
+                }
+                for (Resume r : list) {
+                    extractContact(r, conn);
+                    extractSection(r, conn);
+                }
             }
-            for (Resume r : list) {
-                extractContact(r, conn);
-                extractSection(r, conn);
-            }
-            ps.close();
             return null;
         });
         return list;

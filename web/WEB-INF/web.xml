@@ -6,7 +6,7 @@
 
     <servlet>
         <servlet-name>resumeServlet</servlet-name>
-        <servlet-class>web.ResumeServlet</servlet-class>
+        <servlet-class>com.urise.webapp.web.ResumeServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>resumeServlet</servlet-name>
