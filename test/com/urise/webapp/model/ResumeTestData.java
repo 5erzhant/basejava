@@ -22,32 +22,32 @@ public class ResumeTestData {
         String github = "https://github.com/gkislin";
         String stackoverflow = "https://stackoverflow.com/users/548473/grigory-kislin";
         String homepage = "http://gkislin.ru/";
-//
-//        String personal = "Аналитический склад ума, сильная логика, креативность, инициативность. Пурист кода и архитектуры.";
-//        String objective = "Ведущий стажировок и корпоративного обучения по Java Web и Enterprise технологиям";
-//        TextSection personalSection = new TextSection(personal);
-//        TextSection objectiveSection = new TextSection(objective);
-//
-//        String achievment1 = "Организация команды и успешная реализация Java проектов для " +
-//                "сторонних заказчиков: приложения автопарк на стеке Spring Cloud/микросервисы, система мониторинга " +
-//                "показателей спортсменов на Spring Boot, участие в проекте МЭШ на Play-2, многомодульный Spring Boot " +
-//                "+ Vaadin проект для комплексных DIY смет";
-//        String achievment2 = "С 2013 года: разработка проектов \"Разработка Web приложения\"," +
-//                "\"Java Enterprise\", \"Многомодульный maven. Многопоточность. XML (JAXB/StAX). Веб сервисы " +
-//                "(JAX-RS/SOAP). Удаленное взаимодействие (JMS/AKKA)\". Организация онлайн стажировок и ведение проектов." +
-//                " Более 3500 выпускников.";
-//        ListSection achievmentList = new ListSection();
-//        achievmentList.addContent(achievment1);
-//        achievmentList.addContent(achievment2);
-//
-//        String qualifications1 = "JEE AS: GlassFish (v2.1, v3), OC4J, JBoss, Tomcat, Jetty, WebLogic, WSO2";
-//        String qualifications2 = "Version control: Subversion, Git, Mercury, ClearCase, Perforce";
-//        String qualifications3 = "DB: PostgreSQL(наследование, pgplsql, PL/Python), Redis (Jedis), H2, Oracle, MySQL, " +
-//                "SQLite, MS SQL, HSQLDB";
-//        ListSection qualificationList = new ListSection();
-//        qualificationList.addContent(qualifications1);
-//        qualificationList.addContent(qualifications2);
-//        qualificationList.addContent(qualifications3);
+
+        String personal = "Аналитический склад ума, сильная логика, креативность, инициативность. Пурист кода и архитектуры.";
+        String objective = "Ведущий стажировок и корпоративного обучения по Java Web и Enterprise технологиям";
+        TextSection personalSection = new TextSection(personal);
+        TextSection objectiveSection = new TextSection(objective);
+
+        String achievment1 = "Организация команды и успешная реализация Java проектов для " +
+                "сторонних заказчиков: приложения автопарк на стеке Spring Cloud/микросервисы, система мониторинга " +
+                "показателей спортсменов на Spring Boot, участие в проекте МЭШ на Play-2, многомодульный Spring Boot " +
+                "+ Vaadin проект для комплексных DIY смет";
+        String achievment2 = "С 2013 года: разработка проектов \"Разработка Web приложения\"," +
+                "\"Java Enterprise\", \"Многомодульный maven. Многопоточность. XML (JAXB/StAX). Веб сервисы " +
+                "(JAX-RS/SOAP). Удаленное взаимодействие (JMS/AKKA)\". Организация онлайн стажировок и ведение проектов." +
+                " Более 3500 выпускников.";
+        ListSection achievmentList = new ListSection();
+        achievmentList.addContent(achievment1);
+        achievmentList.addContent(achievment2);
+
+        String qualifications1 = "JEE AS: GlassFish (v2.1, v3), OC4J, JBoss, Tomcat, Jetty, WebLogic, WSO2";
+        String qualifications2 = "Version control: Subversion, Git, Mercury, ClearCase, Perforce";
+        String qualifications3 = "DB: PostgreSQL(наследование, pgplsql, PL/Python), Redis (Jedis), H2, Oracle, MySQL, " +
+                "SQLite, MS SQL, HSQLDB";
+        ListSection qualificationList = new ListSection();
+        qualificationList.addContent(qualifications1);
+        qualificationList.addContent(qualifications2);
+        qualificationList.addContent(qualifications3);
 //
 //        LocalDate begin = LocalDate.of(2013, 10, 1);
 //        LocalDate end = LocalDate.now();
@@ -101,10 +101,10 @@ public class ResumeTestData {
         resume.addContact(ContactType.GITHUB, github);
         resume.addContact(ContactType.STACKOVERFLOW, stackoverflow);
         resume.addContact(ContactType.HOME_PAGE, homepage);
-//        resume.addSection(SectionType.PERSONAL, personalSection);
-//        resume.addSection(SectionType.OBJECTIVE, objectiveSection);
-//        resume.addSection(SectionType.ACHIEVEMENT, achievmentList);
-//        resume.addSection(SectionType.QUALIFICATIONS, qualificationList);
+        resume.addSection(SectionType.PERSONAL, personalSection);
+        resume.addSection(SectionType.OBJECTIVE, objectiveSection);
+        resume.addSection(SectionType.ACHIEVEMENT, achievmentList);
+        resume.addSection(SectionType.QUALIFICATIONS, qualificationList);
 //        resume.addSection(SectionType.EXPERIENCE, companySection);
 //        resume.addSection(SectionType.EDUCATION, edCompanySection);
         return resume;
