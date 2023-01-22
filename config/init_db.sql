@@ -18,5 +18,5 @@ create table section
 (
     type        text,
     value       text,
-    resume_uuid text not null constraint section_resume_uuid_fk references resume
+    resume_uuid text not null constraint section_resume_uuid_fk references resume on delete cascade
 );

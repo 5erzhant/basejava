@@ -1,3 +1,4 @@
+<%@ page import="com.urise.webapp.model.ContactType" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
@@ -14,31 +15,41 @@
 
         td, th {
             border: 1px solid #dddddd;
-            text-align: left;
+            text-align: center;
             padding: 8px;
         }
 
-        tr:nth-child(even) {
-            background-color: #dddddd;
-        }
     </style>
 </head>
 <body>
 <jsp:include page="fragments/header.jsp"/>
 <section>
+    <p align="right">
+        <a href="resume?action=add">Добавить резюме<img src="img/add.png"></a>
+    </p>
     <table>
         <tr>
-            <th>uuid</th>
-            <th>Full name</th>
+            <th>Имя</th>
+            <th>Почта</th>
+            <th>Удалить</th>
+            <th>Редактировать</th>
         </tr>
         <jsp:useBean id="resumes" scope="request" type="java.util.List"/>
         <c:forEach items="${resumes}" var="resume">
+            <jsp:useBean id="resume" type="com.urise.webapp.model.Resume"/>
             <tr>
-                <td> ${resume.uuid} </td>
-                <td> ${resume.fullName} </td>
+                <td><a href="resume?uuid=${resume.uuid}&action=view">${resume.fullName}</a></td>
+                <td><%=ContactType.MAIL.toHtml(resume.getContact(ContactType.MAIL))%>
+                </td>
+                <td><a href="resume?uuid=${resume.uuid}&action=delete"><img src="img/delete.png"></a></td>
+                <td><a href="resume?uuid=${resume.uuid}&action=edit"><img src="img/pencil.png"></a></td>
             </tr>
         </c:forEach>
     </table>
+    <br>
+    <p align="right">
+        <a href="resume?action=clear">Удалить все резюме<img src="img\delete.png"></a>
+    </p>
 </section>
 <jsp:include page="fragments/footer.jsp"/>
 </body>

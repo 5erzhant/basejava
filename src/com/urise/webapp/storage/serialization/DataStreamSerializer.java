@@ -61,7 +61,7 @@ public class DataStreamSerializer implements StreamSerializer {
                     case ACHIEVEMENT, QUALIFICATIONS -> DataStreamSerializer.this.readListSection(dis);
                     case EXPERIENCE, EDUCATION -> DataStreamSerializer.this.readCompanySection(dis);
                 };
-                resume.addSection(type, section);
+                resume.setSection(type, section);
             };
             readWithException(null, dis, actionSection);
             return resume;

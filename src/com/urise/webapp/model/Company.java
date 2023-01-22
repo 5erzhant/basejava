@@ -10,6 +10,8 @@ import java.util.Objects;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Company implements Serializable {
+
+    public static final Company EMPTY = new Company("", "");
     @Serial
     private static final long serialVersionUID = 1L;
 
