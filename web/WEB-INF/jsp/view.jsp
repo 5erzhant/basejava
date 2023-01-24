@@ -54,12 +54,12 @@
                     </tr>
                 </c:when>
                 <c:when test="${type=='EXPERIENCE' || type=='EDUCATION'}">
-                    <c:forEach var="company" items="<%= ((CompanySection)section).getCompanies()%>">
+                    <c:forEach var="company" items="<%=((CompanySection)section).getCompanies()%>">
                         <tr>
                             <td></td>
                             <td>
                                 <c:choose>
-                                    <c:when test="${company.website == null}">
+                                    <c:when test="${company.website==null}">
                                         <br><h4>${company.name}</h4>
                                     </c:when>
                                     <c:otherwise>
@@ -71,7 +71,7 @@
                         <c:forEach var="period" items="${company.periods}">
                             <jsp:useBean id="period" type="com.urise.webapp.model.Period"/>
                             <tr>
-                                <td width="25%" style="vertical-align:top"><%= HtmlUtil.formatDates(period)%>
+                                <td width="25%" style="vertical-align:top"><%=HtmlUtil.formatDates(period)%>
                                 </td>
                                 <td><b>${period.title}</b><br>${period.description}
                                 </td>
